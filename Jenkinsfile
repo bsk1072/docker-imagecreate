@@ -26,7 +26,7 @@ pipeline {
                 echo 'Starting to build docker image'
 
                 script {
-                    customImage = docker.build("bsk1072/testimage:${env.BUILD_ID}")
+                    customImage = docker.build("bsk1072/demoimage:${env.BUILD_ID}")
                     //customImage.push()
                 }
             }
