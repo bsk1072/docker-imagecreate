@@ -1,28 +1,44 @@
 pipeline {
    agent {
-       label 'docker' 
-       
+       label 'master' 
    }
+  environment {
+    registry = "docker_hub_account/bsk1072"
+    registryCredential = 'bsk1072'
+    customImage = ''
+  }
    stages {
       stage('checkout stage') {
          steps {
             // Get some code from a GitHub repository
-            checkout scm
+            git 'https://github.com/bsk1072/docker-imagecreate.git'
          }
       }
          stage ('build stage') {
              steps {
             // Run Maven on a Unix agent.
-            sh "mvn -Dmaven.test.failure.ignore=true clean package"                 
+            sh "mvn install"                 
              }
          }
-   }
-         post {
-            // If Maven was able to run the tests, even if some of the test
-            // failed, record the test results and archive the jar file.
-            success {
-               junit '**/target/surefire-reports/TEST-*.xml'
-               archiveArtifacts 'target/*.jar'
+         
+        stage('Build image') {
+            steps {
+                echo 'Starting to build docker image'
+
+                script {
+                    customImage = docker.build("bsk1072/testimage:${env.BUILD_ID}")
+                    //customImage.push()
+                }
             }
-         }
+        }
+        stage('Deploy Image') {
+          steps{
+            script {
+              docker.withRegistry( '', registryCredential ) {
+                customImage.push()
+              }
+            }
+          }
+        }
+   }
 }
