@@ -11,10 +11,10 @@ pipeline {
       stage('checkout stage') {
          steps {
             // Get some code from a GitHub repository
-            git 'https://github.com/bsk1072/docker-imagecreate.git'
+            checkout scm
          }
       }
-         stage ('build stage') {
+         stage ('build war') {
              steps {
             // Run Maven on a Unix agent.
             sh "mvn install"                 
